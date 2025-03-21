@@ -1,24 +1,19 @@
 package com.zrd.springbootinit.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 用户
- *
+ * @TableName user
  * @author <a href="https://github.com/shark688">shark688</a>
-  
  */
-@TableName(value = "user")
+@TableName(value ="user")
 @Data
 public class User implements Serializable {
-
     /**
      * id
      */
@@ -26,60 +21,30 @@ public class User implements Serializable {
     private Long id;
 
     /**
-     * 用户账号
+     * 手机号
      */
-    private String userAccount;
+    private String phonenumber;
 
     /**
-     * 用户密码
+     * 用户角色：0-user/1-admin/2-ban
      */
-    private String userPassword;
-
-    /**
-     * 开放平台id
-     */
-    private String unionId;
-
-    /**
-     * 公众号openId
-     */
-    private String mpOpenId;
-
-    /**
-     * 用户昵称
-     */
-    private String userName;
-
-    /**
-     * 用户头像
-     */
-    private String userAvatar;
-
-    /**
-     * 用户简介
-     */
-    private String userProfile;
-
-    /**
-     * 用户角色：user/admin/ban
-     */
-    private String userRole;
+    private Integer userrole;
 
     /**
      * 创建时间
      */
-    private Date createTime;
+    private Date createtime;
 
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private Date updatetime;
 
     /**
      * 是否删除
      */
     @TableLogic
-    private Integer isDelete;
+    private Integer isdelete;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
