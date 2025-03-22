@@ -23,28 +23,28 @@ public class User implements Serializable {
     /**
      * 手机号
      */
-    private String phonenumber;
+    private String phoneNumber;
 
     /**
      * 用户角色：0-user/1-admin/2-ban
      */
-    private Integer userrole;
+    private Integer userRole;
 
     /**
      * 创建时间
      */
-    private Date createtime;
+    private Date createTime;
 
     /**
      * 更新时间
      */
-    private Date updatetime;
+    private Date updateTime;
 
     /**
      * 是否删除
      */
     @TableLogic
-    private Integer isdelete;
+    private Integer isDelete;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
