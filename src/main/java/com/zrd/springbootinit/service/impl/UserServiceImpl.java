@@ -60,6 +60,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String redisKey = RedisConstant.PHONE_NUMBER_KEY + phoneNumber;
         redisTemplate.opsForValue().set(redisKey, checkNumber);
         redisTemplate.expire(redisKey,5, TimeUnit.MINUTES);
+        log.info("验证码{}已发送到{}", checkNumber, phoneNumber);
         return true;
     }
 
@@ -96,11 +97,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 用户不存在
         if (user == null) {
             User newUser = new User();
-            newUser.setPhonenumber(phoneNumber);
+            newUser.setPhoneNumber(phoneNumber);
             this.save(newUser);
+            request.getSession().setAttribute(USER_LOGIN_STATE, newUser);
         }
         // 3. 记录用户的登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        else
+        {
+            request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        }
+        log.info("电话号{}已登录", phoneNumber);
         return true;
     }
 
