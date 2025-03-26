@@ -51,7 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public Boolean userGetCheckNumber(String phoneNumber) {
-        String checkNumber = "init";
+        String checkNumber = "123456";
         try {
             //checkNumber = CommentUtils.sendMessage(phoneNumber);
         } catch (Exception e) {
@@ -78,15 +78,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         String redisKey = RedisConstant.PHONE_NUMBER_KEY + phoneNumber;
-        String result = redisTemplate.opsForValue().get(redisKey).toString();
+        Object result = redisTemplate.opsForValue().get(redisKey);
 
         // 如果 Redis 中没有获取到验证码，输出错误信息
         if (result == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"验证码不存在或已过期");
         }
 
+        String resultString = result.toString();
+
         // 如果用户输入的验证码与 Redis 中存储的验证码不一致，输出错误信息
-        if (!StrUtil.equals(result,checkNumber)) {
+        if (!StrUtil.equals(resultString,checkNumber)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"验证码不匹配");
         }
 
