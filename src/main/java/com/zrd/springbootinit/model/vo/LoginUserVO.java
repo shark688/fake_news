@@ -1,8 +1,9 @@
 package com.zrd.springbootinit.model.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 已登录用户视图（脱敏）
@@ -18,25 +19,12 @@ public class LoginUserVO implements Serializable {
      */
     private Long id;
 
-    /**
-     * 用户昵称
-     */
-    private String userName;
+    private String phoneNumber;
 
     /**
-     * 用户头像
+     * 用户角色：user - 0/admin - 1/ban - 2
      */
-    private String userAvatar;
-
-    /**
-     * 用户简介
-     */
-    private String userProfile;
-
-    /**
-     * 用户角色：user/admin/ban
-     */
-    private String userRole;
+    private Integer userRole;
 
     /**
      * 创建时间
