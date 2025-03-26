@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zrd.springbootinit.mapper.NewsMapper">
+
+    <resultMap id="BaseResultMap" type="com.zrd.springbootinit.model.entity.News">
+            <id property="newsId" column="newsId" jdbcType="BIGINT"/>
+            <result property="userId" column="userId" jdbcType="BIGINT"/>
+            <result property="newsTitle" column="newsTitle" jdbcType="VARCHAR"/>
+            <result property="newsContent" column="newsContent" jdbcType="VARCHAR"/>
+            <result property="newsUrl" column="newsUrl" jdbcType="VARCHAR"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        newsId,userId,newsTitle,
+        newsContent,newsUrl,createTime,
+        updateTime,isDelete
+    </sql>
+</mapper>
