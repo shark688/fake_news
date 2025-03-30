@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import com.zrd.springbootinit.common.BaseResponse;
 import com.zrd.springbootinit.common.ErrorCode;
 import com.zrd.springbootinit.common.ResultUtils;
-import com.zrd.springbootinit.config.WxOpenConfig;
 import com.zrd.springbootinit.exception.BusinessException;
 import com.zrd.springbootinit.model.dto.user.UserLoginRequest;
 import com.zrd.springbootinit.model.entity.User;
@@ -32,8 +31,6 @@ public class UserController {
     @Resource
     private UserService userService;
 
-    @Resource
-    private WxOpenConfig wxOpenConfig;
 
     // region 登录相关
 
