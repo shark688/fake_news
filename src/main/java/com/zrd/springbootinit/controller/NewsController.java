@@ -10,12 +10,10 @@ import com.zrd.springbootinit.common.ResultUtils;
 import com.zrd.springbootinit.exception.BusinessException;
 import com.zrd.springbootinit.model.dto.news.NewsCheckRequest;
 import com.zrd.springbootinit.model.entity.User;
-import com.zrd.springbootinit.model.vo.NewsListVO;
-import com.zrd.springbootinit.model.vo.NewsReverseListVO;
-import com.zrd.springbootinit.model.vo.NewsVO;
-import com.zrd.springbootinit.model.vo.UserVO;
+import com.zrd.springbootinit.model.vo.*;
 import com.zrd.springbootinit.service.NewsService;
 import com.zrd.springbootinit.service.UserService;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -118,6 +116,26 @@ public class NewsController {
 
         // 可以在这里添加权限验证或其他业务逻辑
         IPage<NewsReverseListVO> newsPage = newsService.getReverseNewsPage(page, size, loginUser);
+        return ResultUtils.success(newsPage);
+    }
+
+    /**
+     * 根据id获取翻转新闻时间线
+     * @param newsId
+     * @param request
+     * @return
+     */
+    @GetMapping("/reverseOne/{newsId}")
+    public BaseResponse<IPage<ReverseNewsVO>> userGetReverseNewsLine(
+            @PathVariable Integer newsId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request) {
+
+        User loginUser = userService.getLoginUser(request);
+
+        // 可以在这里添加权限验证或其他业务逻辑
+        IPage<ReverseNewsVO> newsPage = newsService.getReverseNewsLine(newsId, page, size, loginUser);
         return ResultUtils.success(newsPage);
     }
 }

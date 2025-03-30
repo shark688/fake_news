@@ -5,9 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zrd.springbootinit.common.ErrorCode;
 import com.zrd.springbootinit.exception.BusinessException;
 import com.zrd.springbootinit.model.entity.*;
-import com.zrd.springbootinit.model.vo.ApiResponse;
-import com.zrd.springbootinit.model.vo.NewsReverseListVO;
-import com.zrd.springbootinit.model.vo.NewsVO;
+import com.zrd.springbootinit.model.vo.*;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -21,7 +19,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zrd.springbootinit.mapper.ResultsMapper;
 import com.zrd.springbootinit.mapper.NewsMapper;
 import com.zrd.springbootinit.model.enums.NewsStatusEnum;
-import com.zrd.springbootinit.model.vo.NewsListVO;
 import com.zrd.springbootinit.service.AnalystreportsService;
 import com.zrd.springbootinit.service.EvidenceService;
 import com.zrd.springbootinit.service.NewsService;
@@ -412,6 +409,39 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
             Integer statusCode = latestResult != null ? latestResult.getStatus() : null;
             vo.setStatus(NewsStatusEnum.getEnumByValue(statusCode).getText());
             vo.setIsReverse(news.getIsReverse());
+            return vo;
+        });
+    }
+
+    /**
+     * 获取翻转新闻记录时间线列表
+     * @param page
+     * @param size
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public IPage<ReverseNewsVO> getReverseNewsLine(Integer newsId, Integer page, Integer size, User loginUser) {
+        Long currentUserId = loginUser.getId();
+
+        // 创建分页对象
+        Page<Results> pageInfo = new Page<>(page, size);
+
+        QueryWrapper<Results> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("newsId", newsId)
+                .orderByDesc("verificationTime");
+
+        // 执行分页查询
+        Page<Results> resultsPage = resultsService.page(pageInfo, queryWrapper);
+
+        // 转换为VO对象，并获取每个news对应的最新result的status
+        return resultsPage.convert(results -> {
+            ReverseNewsVO vo = new ReverseNewsVO();
+
+            String formattedTime = DateUtil.format(results.getVerificationTime(), "yyyy-MM-dd HH:mm:ss");
+            vo.setVerificationTime(formattedTime);
+            vo.setSummaryContent(results.getSummaryContent());
+            vo.setStatus(NewsStatusEnum.getEnumByValue(results.getStatus()).getText());
             return vo;
         });
     }

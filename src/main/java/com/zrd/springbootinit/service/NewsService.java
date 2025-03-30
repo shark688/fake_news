@@ -8,6 +8,7 @@ import com.zrd.springbootinit.model.entity.User;
 import com.zrd.springbootinit.model.vo.NewsListVO;
 import com.zrd.springbootinit.model.vo.NewsReverseListVO;
 import com.zrd.springbootinit.model.vo.NewsVO;
+import com.zrd.springbootinit.model.vo.ReverseNewsVO;
 
 import java.util.List;
 
@@ -49,4 +50,13 @@ public interface NewsService extends IService<News> {
      * @return
      */
     IPage<NewsReverseListVO> getReverseNewsPage(Integer page, Integer size, User loginUser);
+
+    /**
+     * 获取翻转新闻时间线
+     * @param page
+     * @param size
+     * @param loginUser
+     * @return
+     */
+    IPage<ReverseNewsVO> getReverseNewsLine(Integer newsId, Integer page, Integer size, User loginUser);
 }
