@@ -1,8 +1,13 @@
 package com.zrd.springbootinit.config;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
  * 全局跨域配置
@@ -25,4 +30,17 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .exposedHeaders("*");
     }
+
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter jsonConverter =
+                        (MappingJackson2HttpMessageConverter) converter;
+                jsonConverter.getObjectMapper().configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, false);
+            }
+        }
+    }
+
+
 }
