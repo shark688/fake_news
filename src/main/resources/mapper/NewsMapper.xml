@@ -10,6 +10,7 @@
             <result property="newsTitle" column="newsTitle" jdbcType="VARCHAR"/>
             <result property="newsContent" column="newsContent" jdbcType="VARCHAR"/>
             <result property="newsUrl" column="newsUrl" jdbcType="VARCHAR"/>
+            <result property="isReverse" column="isReverse" jdbcType="TINYINT"/>
             <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
             <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
@@ -17,7 +18,7 @@
 
     <sql id="Base_Column_List">
         newsId,userId,newsTitle,
-        newsContent,newsUrl,createTime,
-        updateTime,isDelete
+        newsContent,newsUrl,isReverse,
+        createTime,updateTime,isDelete
     </sql>
 </mapper>

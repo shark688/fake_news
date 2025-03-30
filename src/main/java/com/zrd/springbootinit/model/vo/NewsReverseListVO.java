@@ -5,13 +5,13 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 新闻列表结果视图
+ * 翻转新闻列表结果视图
  *
  * @author <a href="https://github.com/shark688">shark688</a>
   
  */
 @Data
-public class NewsListVO implements Serializable {
+public class NewsReverseListVO implements Serializable {
 
     /**
      * id

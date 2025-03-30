@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.zrd.springbootinit.model.entity.News;
 import com.zrd.springbootinit.model.entity.User;
 import com.zrd.springbootinit.model.vo.NewsListVO;
+import com.zrd.springbootinit.model.vo.NewsReverseListVO;
 import com.zrd.springbootinit.model.vo.NewsVO;
 
 import java.util.List;
@@ -39,4 +40,13 @@ public interface NewsService extends IService<News> {
      * @return
      */
     NewsVO getVOById(Integer newsId, User loginUser);
+
+    /**
+     * 获取翻转新闻记录列表
+     * @param page
+     * @param size
+     * @param loginUser
+     * @return
+     */
+    IPage<NewsReverseListVO> getReverseNewsPage(Integer page, Integer size, User loginUser);
 }

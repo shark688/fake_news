@@ -40,6 +40,11 @@ public class News implements Serializable {
     private String newsUrl;
 
     /**
+     * 是否为翻转新闻
+     */
+    private Integer isReverse;
+
+    /**
      * 创建时间
      */
     private Date createTime;

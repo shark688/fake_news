@@ -1,10 +1,13 @@
 package com.zrd.springbootinit.service.impl;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.tokenizer.engine.analysis.AnalysisResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.zrd.springbootinit.common.ErrorCode;
 import com.zrd.springbootinit.exception.BusinessException;
 import com.zrd.springbootinit.model.entity.*;
+import com.zrd.springbootinit.model.vo.ApiResponse;
+import com.zrd.springbootinit.model.vo.NewsReverseListVO;
 import com.zrd.springbootinit.model.vo.NewsVO;
-import com.zrd.springbootinit.model.vo.ProcessResponse.Analysis;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -19,18 +22,15 @@ import com.zrd.springbootinit.mapper.ResultsMapper;
 import com.zrd.springbootinit.mapper.NewsMapper;
 import com.zrd.springbootinit.model.enums.NewsStatusEnum;
 import com.zrd.springbootinit.model.vo.NewsListVO;
-import com.zrd.springbootinit.model.vo.ProcessResponse;
 import com.zrd.springbootinit.service.AnalystreportsService;
 import com.zrd.springbootinit.service.EvidenceService;
 import com.zrd.springbootinit.service.NewsService;
 import com.zrd.springbootinit.service.ResultsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 * @createDate 2025-03-25 21:51:26
 */
 @Service
+@Slf4j
 public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
     implements NewsService{
 
@@ -86,6 +87,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
 
             Integer statusCode = latestResult != null ? latestResult.getStatus() : null;
             vo.setStatus(NewsStatusEnum.getEnumByValue(statusCode).getText());
+            vo.setIsReverse(news.getIsReverse());
             return vo;
         });
     }
@@ -115,81 +117,108 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
 
 
         // 1. 目标URL（本地8080端口）
-//        String url = "http://localhost:5010/api/judge";
-//
-//        // 2. 构造JSON请求体
-//        JSONObject jsonBody = new JSONObject();
-//        jsonBody.set("text", "示例文本1");
-//
-//        // 3. 发送POST请求
-//        String response = HttpRequest.post(url)
-//                .header("Content-Type", "application/json") // 必须设置Content-Type
-//                .body(jsonBody.toString()) // JSON字符串作为请求体
-//                .execute()
-//                .body();
+        String url = "http://192.168.1.104:5010/api/judge";
 
-        String response = "{\n" +
-        "    \"result\": true,\n" +
-                "    \"title\": \"世卫组织宣布新冠疫情全球卫生紧急状态结束\",\n" +
-                "    \"summaryContent\": \"经核实，该消息与世界卫生组织官方声明一致，多方权威媒体均有报道。\",\n" +
-                "    \"evidences\": [\n" +
-                "      {\n" +
-                "        \"id\": 1,\n" +
-                "        \"evidence\": \"世界卫生组织官网2023年5月5日发布的正式声明\",\n" +
-                "        \"score\": 100\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"id\": 2,\n" +
-                "        \"evidence\": \"BBC、CNN等国际主流媒体的同步报道\",\n" +
-                "        \"score\": 98\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"analyses\": [\n" +
-                "      {\n" +
-                "        \"analysis\": \"官方来源验证：直接匹配世卫组织官网声明\",\n" +
-                "        \"relatedEvidence\": [1]\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"analysis\": \"媒体一致性验证：多方权威媒体同步报道\",\n" +
-                "        \"relatedEvidence\": [2]\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }";
+        // 2. 构造JSON请求体
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.set("data", newContent);
+        jsonBody.set("k", 5);
+        jsonBody.set("id", news.getNewsId());
 
-        ProcessResponse processResponse = JSONUtil.toBean(response, ProcessResponse.class);
+        // 3. 发送POST请求
+        String response = HttpRequest.post(url)
+                .header("Content-Type", "application/json;charset=utf-8") // 必须设置Content-Type
+                .body(jsonBody.toString()) // JSON字符串作为请求体
+                .execute()
+                .charset("utf-8")  // 强制指定响应体的编码
+                .body();
 
-        Boolean result = processResponse.getResult();
-        String title = processResponse.getTitle();
-        String summaryContent = processResponse.getSummaryContent();
-        List<ProcessResponse.EvidenceVO> evidences = processResponse.getEvidences();
-        List<Analysis> analyses = processResponse.getAnalyses();
+        log.info("返回结果为{}",response);
+
+//        String response = "{\n" +
+//                "    \"code\": 200,\n" +
+//                "    \"data\": {\n" +
+//                "        \"analysis\": {\n" +
+//                "            \"consistency\": [\n" +
+//                "                \"Both reports from Analyst 1 are consistent in indicating that Poland is indeed considering the acquisition of nuclear weapons.\",\n" +
+//                "                \"The second report provides additional context and reasons behind this consideration, reinforcing the first report.\"\n" +
+//                "            ],\n" +
+//                "            \"evaluations\": [\n" +
+//                "                {\n" +
+//                "                    \"content\": \"states that **TRUE**\",\n" +
+//                "                    \"id\": 1\n" +
+//                "                },\n" +
+//                "                {\n" +
+//                "                    \"content\": \"provides additional context that Poland is considering the acquisition of nuclear weapons due to concerns over potential US withdrawal from Europe and perceived threats from Russia\",\n" +
+//                "                    \"id\": 2\n" +
+//                "                }\n" +
+//                "            ]\n" +
+//                "        },\n" +
+//                "        \"collection\": {\n" +
+//                "            \"reports\": [\n" +
+//                "                {\n" +
+//                "                    \"content\": \"**TRUE**\",\n" +
+//                "                    \"id\": 1,\n" +
+//                "                    \"importance_score\": 100\n" +
+//                "                },\n" +
+//                "                {\n" +
+//                "                    \"content\": \"Poland is considering the acquisition of nuclear weapons as a strategic move to counter perceived threats from Russia and to enhance its defense capabilities. This decision is influenced by concerns over potential US withdrawal from Europe, which could leave Poland more vulnerable to Russian aggression.\",\n" +
+//                "                    \"id\": 2,\n" +
+//                "                    \"importance_score\": 90\n" +
+//                "                }\n" +
+//                "            ]\n" +
+//                "        },\n" +
+//                "        \"conclusion\": {\n" +
+//                "            \"evidence\": \"Direct Statement: Analyst 1 directly states that Poland is considering the acquisition of nuclear weapons\\nContextual Reasoning: Analyst 1 provides reasons for this consideration, including concerns over potential US withdrawal from Europe and perceived threats from Russia\",\n" +
+//                "            \"final_judgment\": \"TRUE\",\n" +
+//                "            \"news_statement\": \"震惊世界！波兰不得不不考虑不获得氮武器\"\n" +
+//                "        }\n" +
+//                "    },\n" +
+//                "    \"message\": \"ok\"\n" +
+//                "}";
+
+        // 1. 将JSON转换为实体类
+        ApiResponse apiResponse = JSONUtil.toBean(response, ApiResponse.class);
+        ApiResponse.AnalysisResultResponse analysisResult = apiResponse.getData();
+
+        ApiResponse.Analysis resultAnalysis = analysisResult.getAnalysis();
+        ApiResponse.Conclusion conclusion = analysisResult.getConclusion();
+        ApiResponse.Collection collection = analysisResult.getCollection();
+
+        Boolean result = StrUtil.equals(conclusion.getFinalJudgment(),"TRUE");
+        String title = conclusion.getNewsStatement();
+        String conclusionEvidence = conclusion.getEvidence();
+        List<ApiResponse.Report> reports = collection.getReports();
+        List<ApiResponse.Evaluation> evaluations = resultAnalysis.getEvaluations();
 
         news.setNewsTitle(title);
         this.updateById(news);
 
         results.setStatus(result ? 1 : 0);
-        results.setSummaryContent(summaryContent);
+        results.setSummaryContent(conclusionEvidence);
         results.setVerificationTime(new Date());
         resultsService.updateById(results);
 
         // 3. 保存分析报告
-        for (ProcessResponse.Analysis analysis : analyses) {
+        for (ApiResponse.Evaluation evaluation : evaluations) {
             Analystreports report = new Analystreports();
             report.setResultId(results.getResultId());
-            report.setReportContent(analysis.getAnalysis());
+            report.setReportContent(evaluation.getContent());
             analystreportsService.save(report);
 
             // 4. 保存证据
-            List<Integer> relatedEvidenceIds = analysis.getRelatedEvidence();
-            List<ProcessResponse.EvidenceVO> relatedEvidences = evidences.stream()
-                    .filter(e -> relatedEvidenceIds.contains(e.getId()))
-                    .collect(Collectors.toList());
+            Integer relatedEvidenceIds = evaluation.getId();
+            Optional<ApiResponse.Report> matchedReport = reports.stream()
+                    .filter(e -> e.getId() == relatedEvidenceIds)
+                    .findFirst();
 
-            for (ProcessResponse.EvidenceVO evidence : relatedEvidences) {
+            if (matchedReport.isPresent()) {
                 Evidence evidenceEntity = new Evidence();
                 evidenceEntity.setReportId(report.getReportId());
-                evidenceEntity.setEvidenceContent(evidence.getEvidence());
-                evidenceEntity.setConfidenceLevel(evidence.getScore());
+                evidenceEntity.setEvidenceContent(matchedReport.get().getContent());
+                // 使用report的importance_score作为置信度，如果没有则使用默认值
+                evidenceEntity.setConfidenceLevel(matchedReport.get().getImportanceScore() != null ?
+                        matchedReport.get().getImportanceScore() : 80);
                 evidenceService.save(evidenceEntity);
             }
         }
@@ -268,6 +297,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
         for (Evidence evidence : evidences) {
             mermaidCode.append("    B --> B").append(evidenceCounter)
                     .append("[\"").append(escapeMermaidText(evidence.getEvidenceContent()))
+                    .append("\n(可信度"+String.valueOf(evidence.getConfidenceLevel())+")\n")
                     .append("\"]\n");
             evidenceCounter++;
         }
@@ -294,11 +324,23 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
         //mermaidCode.append("    style C fill:#E3F2FD,stroke:#42A5F5,stroke-width:1.8px");
         mermaidCode.append("\n");
 
+        mermaidCode.append("    E[\"验证结果\"]\n");
+        mermaidCode.append("    E --> E1[\"✓ ").append(getStatusText(latestResult.getStatus())).append("\"]\n");
+
+
         // 结论总结区块(D节点)
         //mermaidCode.append("    %% 第三区块：结论总结\n");
-        mermaidCode.append("    D[\"\"\"结论总结\n");
-        mermaidCode.append("    ✓ 验证结果：").append(getStatusText(latestResult.getStatus())).append("\n");
-        mermaidCode.append("    📌 ").append(escapeMermaidText(latestResult.getSummaryContent())).append("\"\"\"]\n");
+        char indexC = 'D';
+        mermaidCode.append("    " +indexC + "[\"证据总结\"]\n");
+        int lineCounter = 1;
+        String[] summaryLines = latestResult.getSummaryContent().split("\\r?\\n");
+        for (String line : summaryLines) {
+            mermaidCode.append("    D --> D").append(lineCounter)
+                    .append("[\"").append("    📌 ").append(escapeMermaidText(line)).append("\"\"\"]\n");
+            mermaidCode.append("    D").append(lineCounter).append(" --> E\n");
+            lineCounter++;
+        }
+        mermaidCode.append("\n");
         mermaidCode.append("    style D fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px,font-weight:600\n\n");
 
         // 建立C到D的连接
@@ -324,6 +366,54 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
         System.out.println(mermaidCode.toString());
         return newsVO;
 
+    }
+
+    /**
+     * 获取翻转新闻记录列表
+     * @param page
+     * @param size
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public IPage<NewsReverseListVO> getReverseNewsPage(Integer page, Integer size, User loginUser) {
+
+        Long currentUserId = loginUser.getId();
+
+        // 创建分页对象
+        Page<News> pageInfo = new Page<>(page, size);
+
+        QueryWrapper<News> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userId", currentUserId)
+                .eq("isReverse",1)
+                .orderByDesc("createTime");
+
+        // 执行分页查询
+        Page<News> newsPage = this.page(pageInfo, queryWrapper);
+
+        // 转换为VO对象，并获取每个news对应的最新result的status
+        return newsPage.convert(news -> {
+            NewsReverseListVO vo = new NewsReverseListVO();
+            vo.setId(news.getNewsId());
+            vo.setTitle(news.getNewsTitle());
+
+            // 转换为目标格式（2025-03-18 15:47:32）
+            String formattedTime = DateUtil.format(news.getCreateTime(), "yyyy-MM-dd HH:mm:ss");
+
+            vo.setCreateTime(formattedTime);
+
+            // 查询该newsId对应的最新result记录的status
+            QueryWrapper<Results> resultWrapper = new QueryWrapper<>();
+            resultWrapper.eq("newsId", news.getNewsId())
+                    .orderByDesc("createTime")
+                    .last("LIMIT 1");
+            Results latestResult = resultsService.getOne(resultWrapper);
+
+            Integer statusCode = latestResult != null ? latestResult.getStatus() : null;
+            vo.setStatus(NewsStatusEnum.getEnumByValue(statusCode).getText());
+            vo.setIsReverse(news.getIsReverse());
+            return vo;
+        });
     }
 
 

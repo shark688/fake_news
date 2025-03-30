@@ -11,6 +11,7 @@ import com.zrd.springbootinit.exception.BusinessException;
 import com.zrd.springbootinit.model.dto.news.NewsCheckRequest;
 import com.zrd.springbootinit.model.entity.User;
 import com.zrd.springbootinit.model.vo.NewsListVO;
+import com.zrd.springbootinit.model.vo.NewsReverseListVO;
 import com.zrd.springbootinit.model.vo.NewsVO;
 import com.zrd.springbootinit.model.vo.UserVO;
 import com.zrd.springbootinit.service.NewsService;
@@ -98,5 +99,25 @@ public class NewsController {
         User loginUser = userService.getLoginUser(request);
         NewsVO result = newsService.getVOById(newsId, loginUser);
         return ResultUtils.success(result);
+    }
+
+    /**
+     * 获取翻转新闻列表
+     * @param page
+     * @param size
+     * @param request
+     * @return
+     */
+    @GetMapping("/listReverse")
+    public BaseResponse<IPage<NewsReverseListVO>> userGetReverseNews(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request) {
+
+        User loginUser = userService.getLoginUser(request);
+
+        // 可以在这里添加权限验证或其他业务逻辑
+        IPage<NewsReverseListVO> newsPage = newsService.getReverseNewsPage(page, size, loginUser);
+        return ResultUtils.success(newsPage);
     }
 }
