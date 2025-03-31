@@ -366,6 +366,23 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
         // 在返回前调用
         newsVO.setMermaidString(JSONUtil.toJsonStr(mermaidCode));
         System.out.println(mermaidCode.toString());
+
+        // 1. 目标URL（本地8080端口）
+        String url = "http://192.168.1.104:5010/api/graph";
+
+        // 2. 构造JSON请求体
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.set("id", newsId);
+
+        // 3. 发送POST请求
+        String response = HttpRequest.post(url)
+                .header("Content-Type", "application/json;charset=utf-8") // 必须设置Content-Type
+                .body(jsonBody.toString()) // JSON字符串作为请求体
+                .execute()
+                .charset("utf-8")  // 强制指定响应体的编码
+                .body();
+
+
         return newsVO;
 
     }
