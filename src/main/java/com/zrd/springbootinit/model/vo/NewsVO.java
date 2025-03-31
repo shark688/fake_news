@@ -28,6 +28,16 @@ public class NewsVO implements Serializable {
      */
     private String mermaidString;
 
+    /**
+     * 是否翻转
+     */
+    private Integer isReverse;
+
+    /**
+     * 创建时间
+     */
+    private String createTime;
+
 
     private static final long serialVersionUID = 1L;
 }

@@ -241,6 +241,11 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
 
         newsVO.setContent(news.getNewsContent());
         newsVO.setTitle(news.getNewsTitle());
+        newsVO.setIsReverse(news.getIsReverse());
+
+        String formattedTime = DateUtil.format(news.getCreateTime(), "yyyy-MM-dd HH:mm:ss");
+
+        newsVO.setCreateTime(formattedTime);
 
         // 2. 查询验证结果和相关数据
         Results latestResult = resultsService.getOne(
@@ -277,7 +282,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
 
         // 3. 构建Mermaid代码
         StringBuilder mermaidCode = new StringBuilder();
-        mermaidCode.append("graph TD");
+        mermaidCode.append("graph TD").append("\n");
 
         // 新闻标题区块
         //mermaidCode.append("    %% 第一区块：新闻标题\n");
@@ -333,7 +338,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
         String[] summaryLines = latestResult.getSummaryContent().split("\\r?\\n");
         for (String line : summaryLines) {
             mermaidCode.append("    D --> D").append(lineCounter)
-                    .append("[\"").append("    📌 ").append(escapeMermaidText(line)).append("\"\"\"]\n");
+                    .append("[\"").append("    📌 ").append(escapeMermaidText(line)).append("\"]\n");
             mermaidCode.append("    D").append(lineCounter).append(" --> E\n");
             lineCounter++;
         }
