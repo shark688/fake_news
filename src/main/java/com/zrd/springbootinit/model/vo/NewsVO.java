@@ -34,6 +34,11 @@ public class NewsVO implements Serializable {
     private Integer isReverse;
 
     /**
+     * 新闻状态
+     */
+    private String status;
+
+    /**
      * 创建时间
      */
     private String createTime;

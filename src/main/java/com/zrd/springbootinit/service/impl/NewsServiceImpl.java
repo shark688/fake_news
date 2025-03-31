@@ -382,6 +382,9 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
                 .charset("utf-8")  // 强制指定响应体的编码
                 .body();
 
+        Integer statusCode = latestResult != null ? latestResult.getStatus() : null;
+        newsVO.setStatus(NewsStatusEnum.getEnumByValue(statusCode).getText());
+
 
         return newsVO;
 
