@@ -59,4 +59,18 @@ public interface NewsService extends IService<News> {
      * @return
      */
     IPage<ReverseNewsVO> getReverseNewsLine(Integer newsId, Integer page, Integer size, User loginUser);
+
+    /**
+     * 逻辑删除新闻
+     * @param newsId 新闻ID
+     * @return 是否删除成功
+     */
+    boolean deleteNewsById(Long newsId);
+
+    /**
+     * 批量逻辑删除新闻
+     * @param newsIds 新闻ID列表
+     * @return 是否删除成功
+     */
+    boolean batchDeleteNews(List<Long> newsIds);
 }

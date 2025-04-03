@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zrd.springbootinit.common.BaseResponse;
+import com.zrd.springbootinit.common.DeleteBatchRequest;
 import com.zrd.springbootinit.common.ErrorCode;
 import com.zrd.springbootinit.common.ResultUtils;
 import com.zrd.springbootinit.exception.BusinessException;
@@ -137,5 +138,25 @@ public class NewsController {
         // 可以在这里添加权限验证或其他业务逻辑
         IPage<ReverseNewsVO> newsPage = newsService.getReverseNewsLine(newsId, page, size, loginUser);
         return ResultUtils.success(newsPage);
+    }
+
+
+    /**
+     * 删除单条新闻
+     */
+    @DeleteMapping("/{newsId}")
+    public BaseResponse<Boolean> deleteNews(@PathVariable Long newsId) {
+        boolean result = newsService.deleteNewsById(newsId);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 批量删除新闻
+     */
+    @DeleteMapping("/batch")
+    public BaseResponse<Boolean> batchDeleteNews(@RequestBody DeleteBatchRequest deleteBatchRequest) {
+        List<Long> newsIds = deleteBatchRequest.getIds();
+        boolean result = newsService.batchDeleteNews(newsIds);
+        return ResultUtils.success(result);
     }
 }

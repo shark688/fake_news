@@ -472,6 +472,36 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News>
     }
 
 
+
+    @Override
+    public boolean deleteNewsById(Long newsId) {
+        return this.removeById(newsId);
+    }
+
+    @Override
+    public boolean batchDeleteNews(List<Long> newsIds) {
+        if (newsIds == null || newsIds.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数不能为空");
+        }
+
+        // 检查ID是否都存在
+        long existCount = count(new LambdaQueryWrapper<News>()
+                .in(News::getNewsId, newsIds));
+
+        if (existCount != newsIds.size()) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"有不存在的id");
+        }
+
+        // 执行删除
+        boolean result = removeByIds(newsIds);
+
+        if (!result) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+        }
+
+        return result;
+    }
+
     // 辅助方法：转义Mermaid特殊字符
     private String escapeMermaidText(String text) {
         if (text == null) return "";
